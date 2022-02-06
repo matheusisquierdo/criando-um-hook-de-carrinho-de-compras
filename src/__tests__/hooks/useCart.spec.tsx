@@ -8,6 +8,7 @@ import { useCart, CartProvider } from '../../hooks/useCart';
 const apiMock = new AxiosMock(api);
 
 jest.mock('react-toastify');
+jest.setTimeout(60000);
 
 const mockedToastError = toast.error as jest.Mock;
 const mockedSetItemLocalStorage = jest.spyOn(Storage.prototype, 'setItem');
@@ -89,7 +90,7 @@ describe('useCart Hook', () => {
       result.current.addProduct(productId);
     });
 
-    await waitForNextUpdate({ timeout: 200 });
+    await waitForNextUpdate({ timeout: 500 });
 
     expect(result.current.cart).toEqual(
       expect.arrayContaining([
@@ -145,7 +146,7 @@ describe('useCart Hook', () => {
           'Erro na adição do produto'
         );
       },
-      { timeout: 200 }
+      { timeout: 500 }
     );
 
     expect(result.current.cart).toEqual(
@@ -177,7 +178,7 @@ describe('useCart Hook', () => {
       result.current.addProduct(productId);
     });
 
-    await waitForNextUpdate({ timeout: 200 });
+    await waitForNextUpdate({ timeout: 500 });
 
     expect(result.current.cart).toEqual(
       expect.arrayContaining([
@@ -214,9 +215,10 @@ describe('useCart Hook', () => {
     });
     apiMock.onGet(`products/${productId}`).reply(200, {
       id: 2,
-      title: "Tênis VR Caminhada Confortável Detalhes Couro Masculino",
+      title: 'Tênis VR Caminhada Confortável Detalhes Couro Masculino',
       price: 139.9,
-      image: "https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/modulo-redux/tenis2.jpg"
+      image:
+        'https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/modulo-redux/tenis2.jpg',
     });
 
     const { result, waitFor } = renderHook(useCart, {
@@ -234,7 +236,7 @@ describe('useCart Hook', () => {
         );
       },
       {
-        timeout: 200,
+        timeout: 500,
       }
     );
 
@@ -246,6 +248,16 @@ describe('useCart Hook', () => {
 
   it('should be able to remove a product', () => {
     const productId = 2;
+
+    apiMock.onGet(`stock/${productId}`).reply(200, {
+      id: 2,
+      amount: 1,
+    });
+
+    apiMock.onPatch(`stock/${productId}`).reply(200, {
+      id: 2,
+      amount: 1,
+    });
 
     const { result } = renderHook(useCart, {
       wrapper: CartProvider,
@@ -307,7 +319,7 @@ describe('useCart Hook', () => {
       result.current.updateProductAmount({ amount: 2, productId });
     });
 
-    await waitForNextUpdate({ timeout: 200 });
+    await waitForNextUpdate({ timeout: 500 });
 
     expect(result.current.cart).toEqual(
       expect.arrayContaining([
@@ -354,7 +366,7 @@ describe('useCart Hook', () => {
           'Erro na alteração de quantidade do produto'
         );
       },
-      { timeout: 200 }
+      { timeout: 500 }
     );
 
     expect(result.current.cart).toEqual(
@@ -385,7 +397,7 @@ describe('useCart Hook', () => {
           'Quantidade solicitada fora de estoque'
         );
       },
-      { timeout: 200 }
+      { timeout: 500 }
     );
 
     expect(result.current.cart).toEqual(
